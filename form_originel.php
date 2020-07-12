@@ -1,6 +1,7 @@
 <?php
 
   $mode = 'ajout';
+  $id_update = null;
   require_once 'config/configoriginel.php';
 
   try {
@@ -11,7 +12,21 @@
 
   }
 
+  // PRESELECTION CHAMPS SUITE CLICK MODIFIER
 
+  if(isset($_GET['id_edit']) && !empty($_GET['id_edit'])) {
+    
+    $id_update = htmlentities($_GET['id_edit']);
+    $mode = 'edit';
+
+    $reqById = $bdd->prepare("SELECT * FROM clients WHERE id=:id_update");
+    $reqById->execute(array(
+                          'id_update' => $id_update  
+      ));
+
+    $clientsById = $reqById->fetch();
+
+  }
   // AJOUT CLIENTS
 
   if( isset($_POST['nom']) && isset($_POST['prenom']) && isset($_POST['email']) && isset($_POST['cheveux']) && isset($_POST['produits'])) {
@@ -34,36 +49,23 @@
       ));
       header('location:index_originel.php');
     } //MODIFICATION CLIENTS
+    elseif(isset($_POST['mode']) && $_POST['mode'] == 'edit' && !is_null($id_update)) {
 
-    echo "Bonjour";
-    die;
+        $id_update = htmlentities($_GET['id_edit']);
 
-    if(isset($_GET['id_edit']) && !empty($_GET['id_edit'])) {
-    
-      $id_update = htmlentities($_GET['id_edit']);
-      $mode = 'edit';
-
-      $reqById = $bdd->prepare("SELECT * FROM clients WHERE id=:id_update");
-      $reqById->execute(array(
-                            'id_edit' => $id_update  
-        ));
-
-      $clientsById = $reqById->fetch();
-
-      if(isset($_POST['mode']) && $_POST['mode'] == 'edit') {
-
-        $reqUpdate = $bdd->prepare("UPDATE clients SET nom=:nom, prenom=:prenom, email=:email, cheveux=:cheveux, produits=:produits WHERE id=:id_edit");
+        $reqUpdate = $bdd->prepare("UPDATE clients SET nom=:nom, prenom=:prenom, email=:email, cheveux=:cheveux, produits=:produits WHERE id=:id_update");
         $reqUpdate->execute (array(
                                   'nom' => $nom,
                                   'prenom' => $prenom,
                                   'email' => $email,
                                   'cheveux' => $cheveux,
                                   'produits' => $produits,
-                                  'id' => $id_update
+                                  'id_update' => $id_update
             ));
-      }
+      
     }
   } 
+
 
 
 ?>
@@ -93,7 +95,7 @@
 
             <form method="post" action="form_originel.php">
                 <input type="hidden" name="mode" value="<?php echo $mode;?>">
-                <input type="hidden" name="id_edit" value="<?php echo $_GET['id_edit'] ;?>">
+                <input type="hidden" name="id_edit" value="<?php echo $id_update ;?>">
 
                 <div class="form-group">
                     <label for="nom">Nom</label>
