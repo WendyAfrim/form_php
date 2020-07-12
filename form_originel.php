@@ -49,9 +49,9 @@
       ));
       header('location:index_originel.php');
     } //MODIFICATION CLIENTS
-    elseif(isset($_POST['mode']) && $_POST['mode'] == 'edit' && !is_null($id_update)) {
+    elseif(isset($_POST['mode']) && $_POST['mode'] == 'edit') {
 
-        $id_update = htmlentities($_GET['id_edit']);
+        $id_update = $_POST['id_edit'];
 
         $reqUpdate = $bdd->prepare("UPDATE clients SET nom=:nom, prenom=:prenom, email=:email, cheveux=:cheveux, produits=:produits WHERE id=:id_update");
         $reqUpdate->execute (array(
@@ -62,12 +62,8 @@
                                   'produits' => $produits,
                                   'id_update' => $id_update
             ));
-      
     }
   } 
-
-
-
 ?>
 
 <!doctype html>
@@ -89,8 +85,8 @@
             <!-- DEBUT FORMULAIRE -->
 
             <?php include_once 'config/header_originel.php';?>
-
-            <h1>Formulaire - Souscription clients</h1>
+      
+            <h1><?php echo $mode == 'ajout' ? 'Formulaire Ajout nouveau client' : 'Formulaire Modification clients' ;?></h1>
             <br>
 
             <form method="post" action="form_originel.php">
