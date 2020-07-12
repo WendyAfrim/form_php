@@ -1,5 +1,6 @@
 <?php
 
+  $mode = 'ajout';
   require_once 'config/configoriginel.php';
 
   try {
@@ -21,32 +22,47 @@
     $cheveux = htmlentities($_POST['cheveux']);
     $produits= htmlentities($_POST['produits']);
 
-    $reqInsert = $bdd->prepare("INSERT INTO clients (nom,prenom,email,cheveux,produits) VALUES (:nom, :prenom, :email, :cheveux, :produits)");
-    $reqInsert->execute(array(
-                          'nom' => $nom,
-                          'prenom' => $prenom,
-                          'email' => $email,
-                          'cheveux' => $cheveux,
-                          'produits' => $produits
-    ));
-    header('location:index_originel.php');
-  }
+    if(isset($_POST['mode']) && $_POST['mode'] == 'ajout') {
 
+      $reqInsert = $bdd->prepare("INSERT INTO clients (nom,prenom,email,cheveux,produits) VALUES (:nom, :prenom, :email, :cheveux, :produits)");
+      $reqInsert->execute(array(
+                            'nom' => $nom,
+                            'prenom' => $prenom,
+                            'email' => $email,
+                            'cheveux' => $cheveux,
+                            'produits' => $produits
+      ));
+      header('location:index_originel.php');
+    } //MODIFICATION CLIENTS
 
-  /* MODIFICATION CLIENTS */
+    echo "Bonjour";
+    die;
 
-  if(isset($_GET['id_edit']) && !empty($_GET['id_edit'])) {
+    if(isset($_GET['id_edit']) && !empty($_GET['id_edit'])) {
     
-    $id_edit = htmlentities($_GET['id_edit']);
-    $mode = 'edit';
+      $id_update = htmlentities($_GET['id_edit']);
+      $mode = 'edit';
 
-    $reqById = $bdd->prepare("SELECT * FROM clients WHERE id=:id_edit");
-    $reqById->execute(array(
-                          'id_edit' => $id_edit  
-    ));
+      $reqById = $bdd->prepare("SELECT * FROM clients WHERE id=:id_update");
+      $reqById->execute(array(
+                            'id_edit' => $id_update  
+        ));
 
-    $clientsById = $reqById->fetch();
+      $clientsById = $reqById->fetch();
 
+      if(isset($_POST['mode']) && $_POST['mode'] == 'edit') {
+
+        $reqUpdate = $bdd->prepare("UPDATE clients SET nom=:nom, prenom=:prenom, email=:email, cheveux=:cheveux, produits=:produits WHERE id=:id_edit");
+        $reqUpdate->execute (array(
+                                  'nom' => $nom,
+                                  'prenom' => $prenom,
+                                  'email' => $email,
+                                  'cheveux' => $cheveux,
+                                  'produits' => $produits,
+                                  'id' => $id_update
+            ));
+      }
+    }
   } 
 
 
@@ -76,6 +92,9 @@
             <br>
 
             <form method="post" action="form_originel.php">
+                <input type="hidden" name="mode" value="<?php echo $mode;?>">
+                <input type="hidden" name="id_edit" value="<?php echo $_GET['id_edit'] ;?>">
+
                 <div class="form-group">
                     <label for="nom">Nom</label>
                     <input type="text" class="form-control" id="nom" name="nom" value="<?php echo $mode == 'edit' ? $clientsById['nom'] : " ";?>" placeholder="Veuillez entrer votre nom" required>
