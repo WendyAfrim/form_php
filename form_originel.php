@@ -11,9 +11,29 @@
   }
 
 
-// MODIFICATION CLIENTS
+  // AJOUT CLIENTS
 
-  $mode = 'edit';
+  if( isset($_POST['nom']) && isset($_POST['prenom']) && isset($_POST['email']) && isset($_POST['cheveux']) && isset($_POST['produits'])) {
+
+    $nom= htmlentities($_POST['nom']);
+    $prenom = htmlentities($_POST['prenom']);
+    $email = htmlentities($_POST['email']);
+    $cheveux = htmlentities($_POST['cheveux']);
+    $produits= htmlentities($_POST['produits']);
+
+    $reqInsert = $bdd->prepare("INSERT INTO clients (nom,prenom,email,cheveux,produits) VALUES (:nom, :prenom, :email, :cheveux, :produits)");
+    $reqInsert->execute(array(
+                          'nom' => $nom,
+                          'prenom' => $prenom,
+                          'email' => $email,
+                          'cheveux' => $cheveux,
+                          'produits' => $produits
+    ));
+    header('location:index_originel.php');
+  }
+
+
+  /* MODIFICATION CLIENTS */
 
   if(isset($_GET['id_edit']) && !empty($_GET['id_edit'])) {
     
@@ -27,12 +47,10 @@
 
     $clientsById = $reqById->fetch();
 
-  }
+  } 
 
 
 ?>
-
-
 
 <!doctype html>
 <html lang="en">
@@ -57,29 +75,25 @@
             <h1>Formulaire - Souscription clients</h1>
             <br>
 
-            <form method="post" action="save_originel.php">
-
-              <input type="hidden" name="mode" value=<?php echo $mode;?>>
-              <input type="hidden" name="id_edit" value=<?php echo $id_edit; ?>>
-
+            <form method="post" action="form_originel.php">
                 <div class="form-group">
                     <label for="nom">Nom</label>
-                    <input type="text" class="form-control" id="nom" name="nom" required placeholder="Veuillez entrer votre nom" value=<?php echo $mode == 'edit'? $clientsById['nom'] : " " ?>>
+                    <input type="text" class="form-control" id="nom" name="nom" value="<?php echo $mode == 'edit' ? $clientsById['nom'] : " ";?>" placeholder="Veuillez entrer votre nom" required>
                 </div>
 
                 <div class="form-group">
                     <label for="prenom">Prenom</label>
-                    <input type="text" class="form-control" id="prenom" name="prenom" required placeholder="Veuillez entrez votre prénom" value=<?php echo $mode == 'edit' ? $clientsById['prenom'] : " "?>>
+                    <input type="text" class="form-control" id="prenom" name="prenom" value="<?php echo $mode == 'edit' ? $clientsById['prenom'] : " ";?>" placeholder="Veuillez entrez votre prénom" required>
                 </div>
 
                 <div class="form-group">
                     <label for="email">Email</label>
-                    <input type="email" class="form-control" id="email" name="email" required placeholder="name@example.com" value=<?php echo $mode == 'edit' ? $clientsById['email'] : " " ?>>
+                    <input type="email" class="form-control" id="email" name="email" value="<?php echo $mode == 'edit' ? $clientsById['email'] : " " ;?>" placeholder="name@example.com" required>
                 </div>
 
                 <div class="form-group">
                     <label for="cheveux">Type de cheveux</label>
-                    <select class="form-control" id="cheveux" name="cheveux" value=<?php echo $mode == 'edit' ? $clientsById['cheveux'] : " " ?>>
+                    <select class="form-control" id="cheveux" name="cheveux" value="<?php echo $mode == 'edit' ? $clientsById['cheveux'] : " " ; ?>">
                     <option>Lisses</option>
                     <option>Bouclés</option>
                     <option>Frisés</option>
@@ -90,15 +104,15 @@
                 </div>
                 <div class="form-group">
                     <label for="produits">Choix de votre produit</label>
-                    <select multiple class="form-control" id="produits" name="produits" value=<?php echo $mode == 'edit' ? $clientsById['produits'] : " " ?>>
-                    <option>Beurre de karite</option>
-                    <option>Huile de coco</option>
-                    <option>Huile de ricin</option>
-                    <option>African soap</option>
+                    <select multiple class="form-control" id="produits" name="produits" value="<?php echo $mode == 'edit' ? $clientsById['produits'] : "" ;?>">
+                    <option value="Beurre de karite">Beurre de karite</option>
+                    <option value="Huile de coco">Huile de coco</option>
+                    <option value="Huile de ricin">Huile de ricin</option>
+                    <option value="African soap">African soap</option>
                     </select>
                 </div>
                 <button class="btn btn-outline-info">Enregistrer</button>
-    
+            </form>
 
             <!-- FIN FORMULAIRE -->
 
